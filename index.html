@@ -33,13 +33,14 @@ a{color:#7fa8ff;text-decoration:none}
 .note{margin-top:16px;color:#5a6478;font-size:12px;line-height:1.6}
 </style></head><body>
 <h1>국민연금 지분공시 대시보드</h1>
-<div class="sub">DART 오픈API · 최근 90일 · 갱신 2026-07-07 20:18</div>
+<div class="sub">DART 오픈API · 최근 90일 · 갱신 2026-07-07 20:27</div>
 <div class="stats">
 <div class="stat buy"><div class="n">125</div><div class="l">매수 (지분 증가)</div></div>
 <div class="stat sell"><div class="n">113</div><div class="l">매도 (지분 감소)</div></div>
 <div class="stat"><div class="n">238</div><div class="l">전체 공시</div></div>
 </div>
 <div class="dates">
+<input type="search" id="q" placeholder="종목명 검색 (예: SK하이닉스)" style="min-width:200px">
 기간: <input type="date" id="d1"> ~ <input type="date" id="d2">
 <button id="dreset">기간 초기화</button>
 </div>
@@ -66,7 +67,9 @@ function fmt(n){return n==null?"-":n.toLocaleString("ko-KR")}
 function render(){
 const d1=document.getElementById("d1").value.replace(/-/g,"");
 const d2=document.getElementById("d2").value.replace(/-/g,"");
+const q=document.getElementById("q").value.trim().toLowerCase();
 let rows=DATA.filter(r=>{
+if(q&&!r.corp.toLowerCase().includes(q))return false;
 if(d1&&r.rcept_dt<d1)return false;
 if(d2&&r.rcept_dt>d2)return false;
 if(fdir==="buy"&&!((r.delta||0)>0))return false;
@@ -84,6 +87,7 @@ document.querySelector("#t tbody").innerHTML=rows.map(r=>`<tr>
 <td class="${(r.shares||0)>0?"up":(r.shares||0)<0?"down":""}">${r.shares==null?"-":(r.shares>0?"+":"")+fmt(r.shares)+"주"}</td>
 <td>${r.rcept_dt||"-"}</td>
 <td><a href="${r.link}" target="_blank">원문</a></td></tr>`).join("")}
+document.getElementById("q").oninput=render;
 document.getElementById("d1").onchange=render;
 document.getElementById("d2").onchange=render;
 document.getElementById("dreset").onclick=()=>{
